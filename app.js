@@ -1,11 +1,11 @@
 
-const fs = require('fs');
-const generateNewPage = require('./src/page-template.js');
+import { writeFile, copyFile } from './utils/generate-site.js';
+import generateNewPage from './src/page-template.js';
 
-const inquirer = require('inquirer');
+import { prompt } from 'inquirer';
 
 const promptUser = () => {
-    return inquirer.prompt([
+    return prompt([
         {
             type: 'input',
             name: 'name',
@@ -63,7 +63,7 @@ const promptProject = portfolioData => {
     Add a New Project
     =================
     `);
-    return inquirer.prompt([
+    return prompt([
         {
             type: 'input',
             name: 'name',
@@ -135,14 +135,22 @@ const promptProject = portfolioData => {
 promptUser()
   .then(promptProject)
   .then(portfolioData => {
-    const pageHTML = generateNewPage(portfolioData);
-
-    fs.writeFile('./index.html', pageHTML, err => {
-      if (err) throw new Error(err);
-
-      console.log('Page created! Check out index.html in this directory to see it!')
+    return generateNewPage(portfolioData);
   })
+  .then(pageHTML => {
+    return writeFile(pageHTML);
+  })
+  .then(writeFileResponse => {
+      console.log(writeFileResponse);
+      return copyFile();
+  })
+  .then(copyFileResponse => {
+      console.log(copyFileResponse);
+  })
+  .catch(err => {
+      console.log(err);
   });
+
 
 
 
